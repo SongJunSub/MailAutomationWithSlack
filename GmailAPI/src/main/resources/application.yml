@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/MAIL_AUTOMATION
+    username: root
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  batch:
+    jdbc:
+      initialize-schema: always
+      schema: classpath:batchschema/schema-mysql.sql
+
+gmail:
+  api:
+    credentials:
+      path: classpath:certification/credentials.json
+    token:
+      directory: classpath:certification/tokens
+  attachment:
+    directory: /Users/junsub_dev/Project/MailAutomationWithSlack/Attachments
+
+logging:
+  level:
+    root: INFO
+    com.example: DEBUG
