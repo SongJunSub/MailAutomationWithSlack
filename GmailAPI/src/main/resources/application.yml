@@ -15,6 +15,13 @@ spring:
     jdbc:
       initialize-schema: always
       schema: classpath:batchschema/schema-mysql.sql
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer:
+      value-serializer:
+    template:
+      default-topic: gmail-topic
 
 gmail:
   api:
