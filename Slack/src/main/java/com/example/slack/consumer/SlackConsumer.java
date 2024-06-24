@@ -6,6 +6,7 @@ import com.example.slack.repository.EmailHistoryRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,10 +17,8 @@ public class SlackConsumer {
     private final EmailHistoryRepository emailHistoryRepository;
 
     @KafkaListener(topics = "${spring.kafka.template.default-topic}", groupId = "${spring.kafka.consumer.group-id}")
-    public void listener(String message) {
+    public void listener(@Payload EmailDTO emailDTO) {
         try {
-            EmailDTO emailDTO = objectMapper.readValue(message, EmailDTO.class);
-
             EmailHistory emailHistory = new EmailHistory(
                     emailDTO.getSenderName(),
                     emailDTO.getSenderEmail(),
