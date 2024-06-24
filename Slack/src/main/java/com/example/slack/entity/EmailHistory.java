@@ -56,4 +56,14 @@ public class EmailHistory {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
+    public EmailHistory(String senderName, String senderEmail, String subject, String status, String result, boolean hasAttachments, String messageId) {
+        this.senderName = senderName;
+        this.senderEmail = senderEmail;
+        this.subject = subject;
+        this.status = status;
+        this.result = result;
+        this.hasAttachments = hasAttachments;
+        this.messageId = messageId;
+    }
+
 }
