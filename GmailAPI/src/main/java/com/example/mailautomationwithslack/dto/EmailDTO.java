@@ -5,8 +5,6 @@ import lombok.Data;
 @Data
 public class EmailDTO {
 
-    private Long id;
-
     private String senderName;
 
     private String senderEmail;

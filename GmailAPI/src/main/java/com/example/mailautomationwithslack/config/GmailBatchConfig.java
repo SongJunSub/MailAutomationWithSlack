@@ -2,6 +2,7 @@ package com.example.mailautomationwithslack.config;
 
 import com.example.mailautomationwithslack.domain.Attachment;
 import com.example.mailautomationwithslack.domain.Email;
+import com.example.mailautomationwithslack.dto.EmailDTO;
 import com.example.mailautomationwithslack.listener.BatchJobCompletionListener;
 import com.example.mailautomationwithslack.repository.AttachmentRepository;
 import com.example.mailautomationwithslack.repository.EmailRepository;
@@ -34,6 +35,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -81,37 +85,70 @@ public class GmailBatchConfig {
     public Tasklet gmailBatchTasklet() {
         return (contribution, chunkContext) -> {
             List<Message> messages = gmailApiService.listMessages();
+            List<EmailDTO> emailDTOList = new ArrayList<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
             for (Message message : messages) {
-                if (!emailRepository.existsByMessageId(message.getId())) {
-                    String sender = getHeader(message, "From");
-                    String subject = getHeader(message, "Subject");
-                    String body = getBody(message);
-                    boolean hasAttachments = checkForAttachments(message);
+                EmailDTO emailDTO = new EmailDTO();
 
-                    if (sender != null && subject != null) {
-                        Pattern pattern = Pattern.compile("\"([^\"]+)\"\\s*<([^>]+)>");
-                        Matcher matcher = pattern.matcher(sender);
-                        String senderName = sender;
-                        String senderEmail = sender;
+                emailDTO.setCreatedUser("MAIL_AUTOMATION");
+                emailDTO.setCreatedDate(LocalDateTime.now().format(formatter));
+                emailDTO.setUpdatedUser("MAIL_AUTOMATION");
+                emailDTO.setUpdatedDate(LocalDateTime.now().format(formatter));
 
-                        if (matcher.find()) {
-                            senderName = matcher.group(1);
-                            senderEmail = matcher.group(2);
+                try {
+                    if (!emailRepository.existsByMessageId(message.getId())) {
+                        String sender = getHeader(message, "From");
+                        String subject = getHeader(message, "Subject");
+                        String body = getBody(message);
+                        boolean hasAttachments = checkForAttachments(message);
+
+                        if (sender != null && subject != null) {
+                            Pattern pattern = Pattern.compile("\"([^\"]+)\"\\s*<([^>]+)>");
+                            Matcher matcher = pattern.matcher(sender);
+                            String senderName = sender;
+                            String senderEmail = sender;
+
+                            if (matcher.find()) {
+                                senderName = matcher.group(1);
+                                senderEmail = matcher.group(2);
+                            }
+
+                            Email email = new Email(senderName, senderEmail, subject, body, message.getId(), hasAttachments);
+
+                            emailRepository.save(email);
+
+                            if (hasAttachments) {
+                                saveAttachments(message, email);
+                            }
+
+                            emailDTO.setSenderName(senderName);
+                            emailDTO.setSenderEmail(senderEmail);
+                            emailDTO.setSubject(subject);
+                            emailDTO.setStatus("SUCCESS");
+                            emailDTO.setResult("정상적으로 처리되었습니다.");
+                            emailDTO.setHasAttachments(hasAttachments);
+                            emailDTO.setMessageId(message.getId());
+                        } else {
+                            logger.severe("Email data is missing: sender=" + sender + ", subject=" + subject + ", body=" + body);
+
+                            emailDTO.setStatus("FAILED");
+                            emailDTO.setResult("Email data is missing: sender=" + sender + ", subject=" + subject + ", body=" + body);
                         }
-
-                        Email email = new Email(senderName, senderEmail, subject, body, message.getId(), hasAttachments);
-
-                        emailRepository.save(email);
-
-                        if (hasAttachments) {
-                            saveAttachments(message, email);
-                        }
-                    } else {
-                        logger.severe("Email data is missing: sender=" + sender + ", subject=" + subject + ", body=" + body);
                     }
                 }
+                catch (Exception e) {
+                    logger.severe(e.getMessage());
+
+                    emailDTO.setStatus("FAILED");
+                    emailDTO.setResult("전송 중 문제가 발생하였습니다.\n" + e.getMessage());
+                }
+
+                emailDTOList.add(emailDTO);
             }
+
+            chunkContext.getStepContext().getStepExecution().getJobExecution()
+                    .getExecutionContext().put("emailDTOList", emailDTOList);
 
             return RepeatStatus.FINISHED;
         };
