@@ -15,7 +15,7 @@ public class SlackConsumer {
     private final ObjectMapper objectMapper;
     private final EmailHistoryRepository emailHistoryRepository;
 
-    @KafkaListener(topics = "gmail-topic", groupId = "slack-consumer")
+    @KafkaListener(topics = "${spring.kafka.template.default-topic}", groupId = "${spring.kafka.consumer.group-id}")
     public void listener(String message) {
         try {
             EmailDTO emailDTO = objectMapper.readValue(message, EmailDTO.class);
