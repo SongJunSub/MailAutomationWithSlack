@@ -1,0 +1,27 @@
+package com.example.slack.consumer;
+
+import com.example.slack.dto.EmailDTO;
+import com.example.slack.repository.EmailHistoryRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class SlackConsumer {
+
+    private final ObjectMapper objectMapper;
+    private final EmailHistoryRepository emailHistoryRepository;
+
+    @KafkaListener(topics = "gmail-topic", groupId = "slack-consumer")
+    public void listener(String message) {
+        try {
+            EmailDTO emailDTO = objectMapper.readValue(message, EmailDTO.class);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
