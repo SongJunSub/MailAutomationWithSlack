@@ -2,6 +2,7 @@ package com.example.mailautomationwithslack.config;
 
 import com.example.mailautomationwithslack.domain.Attachment;
 import com.example.mailautomationwithslack.domain.Email;
+import com.example.mailautomationwithslack.listener.BatchJobCompletionListener;
 import com.example.mailautomationwithslack.repository.AttachmentRepository;
 import com.example.mailautomationwithslack.repository.EmailRepository;
 import com.example.mailautomationwithslack.service.GmailApiService;
@@ -51,6 +52,7 @@ public class GmailBatchConfig {
     private final EmailRepository emailRepository;
     private final AttachmentRepository attachmentRepository;
     private final Gmail gmail;
+    private final BatchJobCompletionListener jobCompletionListener;
 
     private static final Logger logger = Logger.getLogger(GmailBatchConfig.class.getName());
 
@@ -61,6 +63,7 @@ public class GmailBatchConfig {
     public Job gmailBatchJob(Step gmailBatchStep) {
         return new JobBuilder("emailBatchJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
+                .listener(jobCompletionListener)
                 .start(gmailBatchStep)
                 .build();
     }
