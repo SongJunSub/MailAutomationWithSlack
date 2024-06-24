@@ -1,2 +1,3 @@
 rootProject.name = 'MailAutomationWithSlack'
 include 'GmailAPI'
+include 'Slack'
