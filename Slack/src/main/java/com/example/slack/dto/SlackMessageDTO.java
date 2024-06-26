@@ -7,11 +7,11 @@ public class SlackMessageDTO {
 
     private String channel;
 
-    private String message;
+    private String text;
 
-    public SlackMessageDTO(String channel, String message) {
+    public SlackMessageDTO(String channel, String text) {
         this.channel = channel;
-        this.message = message;
+        this.text = text;
     }
 
 }

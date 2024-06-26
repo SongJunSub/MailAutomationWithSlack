@@ -41,6 +41,9 @@ public class SlackNotificationService {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
             }
+            else {
+                System.out.println("Result: " + response.body().string());
+            }
         }
         catch (IOException e) {
             throw new RuntimeException(e);
