@@ -37,3 +37,4 @@ out/
 .vscode/
 
 /GmailAPI/src/main/resources/certification/credentials.json
+/Slack/src/main/resources/application-secret.yml

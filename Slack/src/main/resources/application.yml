@@ -32,6 +32,8 @@ spring:
       missing-topics-fatal: false
     template:
       default-topic: gmail-topic
+  config:
+    import: optional:file:./resources/application-secret.yml
 
 logging:
   level:
