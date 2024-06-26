@@ -33,7 +33,7 @@ spring:
     template:
       default-topic: gmail-topic
   config:
-    import: optional:file:./resources/application-secret.yml
+    import: optional:classpath:application-secret.yml
 
 logging:
   level:
