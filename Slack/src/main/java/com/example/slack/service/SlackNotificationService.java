@@ -21,10 +21,13 @@ public class SlackNotificationService {
     @Value("${slack.oauth.token}")
     private String slackToken;
 
-    public void sendSlackMessage(String channel, String message) throws JsonProcessingException {
+    @Value("${slack.channel}")
+    private String slackChannelName;
+
+    public void sendSlackMessage(String message) throws JsonProcessingException {
         String slackURL = "https://slack.com/api/chat.postMessage";
 
-        SlackMessageDTO slackMessageDTO = new SlackMessageDTO(channel, message);
+        SlackMessageDTO slackMessageDTO = new SlackMessageDTO(slackChannelName, message);
 
         RequestBody requestBody = RequestBody.create(objectMapper.writeValueAsString(slackMessageDTO), JSON);
 

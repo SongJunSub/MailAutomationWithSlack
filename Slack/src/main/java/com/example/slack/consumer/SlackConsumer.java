@@ -17,9 +17,6 @@ public class SlackConsumer {
     private final EmailHistoryRepository emailHistoryRepository;
     private final SlackNotificationService slackNotificationService;
 
-    @Value("${slack.channel}")
-    private String slackChannelName;
-
     @KafkaListener(topics = "${spring.kafka.template.default-topic}", groupId = "${spring.kafka.consumer.group-id}")
     public void listener(@Payload EmailDTO emailDTO) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -42,7 +39,7 @@ public class SlackConsumer {
             stringBuilder.append("발송자 메일 : ").append(emailDTO.getSenderEmail()).append("\n");
             stringBuilder.append("첨부파일 유무 : ").append(emailDTO.isHasAttachments());
 
-            slackNotificationService.sendSlackMessage(slackChannelName, stringBuilder.toString());
+            slackNotificationService.sendSlackMessage(stringBuilder.toString());
         }
         catch (Exception e) {
             e.printStackTrace();
