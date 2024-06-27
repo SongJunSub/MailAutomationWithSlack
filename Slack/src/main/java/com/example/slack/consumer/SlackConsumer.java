@@ -5,7 +5,6 @@ import com.example.slack.entity.EmailHistory;
 import com.example.slack.repository.EmailHistoryRepository;
 import com.example.slack.service.SlackNotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
