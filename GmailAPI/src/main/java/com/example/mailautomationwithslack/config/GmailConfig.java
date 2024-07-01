@@ -49,6 +49,10 @@ public class GmailConfig {
 
         Credential credentials = getCredentials(HTTP_TRANSPORT);
 
+        if (credentials.getExpiresInSeconds() != null && credentials.getExpiresInSeconds() <= 60) {
+            credentials.refreshToken();
+        }
+
         return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credentials)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
