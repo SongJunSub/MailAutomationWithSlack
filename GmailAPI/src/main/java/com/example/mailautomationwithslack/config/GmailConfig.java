@@ -49,10 +49,6 @@ public class GmailConfig {
 
         Credential credentials = getCredentials(HTTP_TRANSPORT);
 
-        if (credentials.getExpiresInSeconds() != null && credentials.getExpiresInSeconds() <= 60) {
-            credentials.refreshToken();
-        }
-
         return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credentials)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
@@ -67,7 +63,9 @@ public class GmailConfig {
         }
 
         if (!tokenDirectory.exists()) {
-            tokenDirectory.mkdirs();
+            if (!tokenDirectory.mkdirs()) {
+                throw new IOException("Failed to create token directory: " + tokenDirectoryPath);
+            }
         }
 
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(credentialsResource.getInputStream()));
@@ -79,7 +77,13 @@ public class GmailConfig {
 
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
 
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+
+        if (credential.getExpiresInSeconds() != null && credential.getExpiresInSeconds() <= 60) {
+            credential.refreshToken();
+        }
+
+        return credential;
     }
 
 }
