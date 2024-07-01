@@ -56,7 +56,7 @@ public class GmailConfig {
 
     private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         Resource credentialsResource = resourceLoader.getResource(credentialsFilePath);
-        File tokenDirectory = new File(resourceLoader.getResource(tokenDirectoryPath).getURI());
+        File tokenDirectory = new File(tokenDirectoryPath);
 
         if (!credentialsResource.exists()) {
             throw new FileNotFoundException("Resource not found: " + credentialsFilePath);
